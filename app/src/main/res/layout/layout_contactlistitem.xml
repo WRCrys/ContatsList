@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:padding="10dp">
+    android:padding="10dp"
+    >
 
     <de.hdodenhof.circleimageview.CircleImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,14 +14,12 @@
         android:layout_height="60dp"
         app:civ_border_width="0.5dp"
         app:civ_border_color="@color/black"
-        android:layout_centerVertical="true"
-        android:src="@drawable/ic_back_arrow_teal"/>
+        android:layout_centerVertical="true"/>
     
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/contactImage"
-        android:text="Crystyano Almeida"
         android:layout_centerVertical="true"
         android:layout_marginStart="20dp"
         android:textSize="20sp"

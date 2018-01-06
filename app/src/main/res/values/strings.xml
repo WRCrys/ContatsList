@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">ContatsList</string>
+    
+    <!--Fragment Names-->
+    <string name="edit_contact_fragment">EditContactFragment</string>
+    <string name="contact_fragment">ContactFragment</string>
+    <string name="view_contacts_fragment">ViewContactsFragment</string>
+
+    <!--Keys-->
+
+    <string name="contact">Contact</string>
+
 </resources>
