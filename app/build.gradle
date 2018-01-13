@@ -33,4 +33,7 @@ dependencies {
 
     //Circle ImageView library
     compile 'de.hdodenhof:circleimageview:2.2.0'
+
+    //CardView Library
+    compile 'com.android.support:cardview-v7:27.0.2'
 }
