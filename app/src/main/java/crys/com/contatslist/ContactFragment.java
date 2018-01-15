@@ -15,8 +15,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import crys.com.contatslist.Utils.ContactPropertyListAdapter;
 import crys.com.contatslist.Utils.UniversalImageLoader;
 import crys.com.contatslist.models.Contact;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -37,6 +41,7 @@ public class ContactFragment extends Fragment{
     private Contact mContact;
     private TextView mContactName;
     private CircleImageView mContactImage;
+    private ListView mListView;
 
     @Nullable
     @Override
@@ -45,6 +50,7 @@ public class ContactFragment extends Fragment{
         toolbar = (Toolbar) view.findViewById(R.id.contactToolbar);
         mContactName = (TextView) view.findViewById(R.id.tvName);
         mContactImage = (CircleImageView) view.findViewById(R.id.contactImage);
+        mListView = (ListView) view.findViewById(R.id.lvContactProperties);
         Log.d(TAG, "onCreateView: started");
         mContact = getContactFromBundle();
 
@@ -89,6 +95,13 @@ public class ContactFragment extends Fragment{
     private void init(){
         mContactName.setText(mContact.getName());
         UniversalImageLoader.setImage(mContact.getProfileImage(), mContactImage, null, "https://");
+
+        ArrayList<String> properties = new ArrayList<>();
+        properties.add(mContact.getPhonenumber());
+        properties.add(mContact.getEmail());
+        ContactPropertyListAdapter adapter = new ContactPropertyListAdapter(getActivity(), R.layout.layout_cardview, properties);
+        mListView.setAdapter(adapter);
+        mListView.setDivider(null);
     }
 
     @Override

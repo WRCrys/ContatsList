@@ -27,7 +27,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by cryst on 06/01/2018.
  */
 
-public class CustomListAdapter extends ArrayAdapter<Contact>{
+public class ContactListAdapter extends ArrayAdapter<Contact>{
 
     private LayoutInflater mInflater;
     private List<Contact> mContacts = null;
@@ -36,7 +36,7 @@ public class CustomListAdapter extends ArrayAdapter<Contact>{
     private Context mContext;
     private String mAppend;
 
-    public CustomListAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<Contact> contacts, String append) {
+    public ContactListAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<Contact> contacts, String append) {
         super(context, resource, contacts);
 
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

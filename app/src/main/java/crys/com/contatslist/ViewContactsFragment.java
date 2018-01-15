@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-import crys.com.contatslist.Utils.CustomListAdapter;
+import crys.com.contatslist.Utils.ContactListAdapter;
 import crys.com.contatslist.models.Contact;
 
 /**
@@ -45,7 +44,7 @@ public class ViewContactsFragment extends Fragment {
 
     private AppBarLayout viewContactsBar, searchBar;
 
-    private CustomListAdapter adapter;
+    private ContactListAdapter adapter;
 
     private ListView contactsList;
 
@@ -126,7 +125,7 @@ public class ViewContactsFragment extends Fragment {
         contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
         contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
 
-        adapter = new CustomListAdapter(getActivity(), R.layout.layout_contactlistitem, contacts, "https://");
+        adapter = new ContactListAdapter(getActivity(), R.layout.layout_contactlistitem, contacts, "https://");
         contactsList.setAdapter(adapter);
 
         contactsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
