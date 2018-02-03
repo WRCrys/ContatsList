@@ -1,5 +1,6 @@
 package crys.com.contatslist;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,6 +33,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ContactFragment extends Fragment{
 
     private static final String TAG = "ContactFragment";
+
+    public interface OnEditContactListener{
+        public void onEditContactSelected(Contact contact);
+
+    }
+
+    OnEditContactListener mOnEditContactListener;
+
     //This will evade the nullpointer exception whena adding to a new bundle from MainActivity
     public ContactFragment(){
         super();
@@ -78,6 +87,9 @@ public class ContactFragment extends Fragment{
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: clicked the edit icon");
+
+                mOnEditContactListener.onEditContactSelected(mContact);
+
                 EditContactFragment fragment = new EditContactFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 //Replace whatever is in the fragment_container view with this fragment,
@@ -121,6 +133,10 @@ public class ContactFragment extends Fragment{
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Retrieves the selected contacts from the bundle (coming from MainActivity)
+     * @return
+     */
     private Contact getContactFromBundle(){
         Log.d(TAG, "getContactFromBundle: arguments: "+getArguments());
 
@@ -129,6 +145,17 @@ public class ContactFragment extends Fragment{
             return bundle.getParcelable(getString(R.string.contact));
         }else {
             return null;
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try{
+            mOnEditContactListener = (OnEditContactListener) getActivity();
+        }catch (ClassCastException e){
+            Log.e(TAG, "onAttach: ClassCastException: "+ e.getMessage() );
         }
     }
 }
