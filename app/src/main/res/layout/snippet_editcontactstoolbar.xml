@@ -14,6 +14,22 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
+                    android:id="@+id/ivBackArrow"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginStart="15dp"
+                    android:src="@drawable/ic_back_arrow"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/ivBackArrow"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:text="Edit Contact"
+                    android:layout_marginStart="20dp"/>
+
+                <ImageView
                     android:id="@+id/ivCheckMark"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
@@ -21,12 +37,7 @@
                     android:layout_marginEnd="15dp"
                     android:src="@drawable/ic_checkmark_white"/>
 
-                <ImageView
-                    android:id="@+id/ivBackArrow"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_marginStart="15dp"
-                    android:src="@drawable/ic_back_arrow"/>
+
 
             </RelativeLayout>
 

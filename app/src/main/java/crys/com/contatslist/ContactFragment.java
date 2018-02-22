@@ -90,14 +90,6 @@ public class ContactFragment extends Fragment{
 
                 mOnEditContactListener.onEditContactSelected(mContact);
 
-                EditContactFragment fragment = new EditContactFragment();
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                //Replace whatever is in the fragment_container view with this fragment,
-                //and add the transaction to the back stack so the user can navigate back
-                transaction.replace(R.id.fragment_container, fragment);
-                transaction.addToBackStack(getString(R.string.edit_contact_fragment));
-                Log.d(TAG, "onClick: fragment: " + getString(R.string.edit_contact_fragment));
-                transaction.commit();
             }
         });
 
