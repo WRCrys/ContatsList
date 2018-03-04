@@ -1,6 +1,7 @@
 package crys.com.contatslist;
 
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,9 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import crys.com.contatslist.Utils.UniversalImageLoader;
 import crys.com.contatslist.models.Contact;
@@ -64,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements ViewContactsFragm
     /*
     *Initialize the first fragment (ViewContactsFragment)
     */
-
     private void init(){
         //Class of Fragment
         ViewContactsFragment fragment = new ViewContactsFragment();
@@ -79,6 +82,19 @@ public class MainActivity extends AppCompatActivity implements ViewContactsFragm
     private void initImageLoader(){
         UniversalImageLoader universalImageLoader = new UniversalImageLoader(MainActivity.this);
         ImageLoader.getInstance().init(universalImageLoader.getConfig());
+    }
+
+    /**
+     * Compress a bitmap by the @param "quality"
+     * Quality can be anywhere from 1-100 : 100 being the highest quality
+     * @param bitmap
+     * @param quality
+     * @return
+     */
+    public Bitmap compressBitmap(Bitmap bitmap, int quality){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
+        return bitmap;
     }
 
     /**
