@@ -18,7 +18,10 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import crys.com.contatslist.Utils.ChangePhotoDialog;
 import crys.com.contatslist.Utils.Init;
@@ -57,6 +60,10 @@ public class EditContactFragment extends Fragment implements ChangePhotoDialog.O
         mSelectDevice = (Spinner) view.findViewById(R.id.selectDevice);
         toolbar = (Toolbar) view.findViewById(R.id.editContactToolbar);
         Log.d(TAG, "onCreateView: started.");
+
+        //Set the heading the for the toolbar
+        TextView heading = (TextView)view.findViewById(R.id.textContactToolbar);
+        heading.setText(getString(R.string.edit_contact));
 
         //required for setting up the toolbar
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
@@ -164,6 +171,16 @@ public class EditContactFragment extends Fragment implements ChangePhotoDialog.O
             //compress the image (if you like)
             ((MainActivity)getActivity()).compressBitmap(bitmap, 70);
             mContactImage.setImageBitmap(bitmap);
+        }
+    }
+
+    @Override
+    public void getImagePath(String imagePath) {
+        Log.d(TAG, "getImagePath: got the image path: "+imagePath);
+        if(!imagePath.equals("")){
+            imagePath = imagePath.replace(":/", "://");
+            mSelectedImagePath = imagePath;
+            UniversalImageLoader.setImage(imagePath, mContactImage, null, "");
         }
     }
 

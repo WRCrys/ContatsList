@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -14,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.io.File;
 
 import crys.com.contatslist.R;
 
@@ -27,6 +30,7 @@ public class ChangePhotoDialog extends DialogFragment{
 
     public interface OnPhotoReceivedListener{
         public void getBitmapImage(Bitmap bitmap);
+        public void getImagePath(String imagePath);
     }
 
     OnPhotoReceivedListener mOnPhotoReceived;
@@ -53,6 +57,9 @@ public class ChangePhotoDialog extends DialogFragment{
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: accessing phones memory.");
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent, Init.PICKFILE_REQUEST_CODE);
             }
         });
         //Cancel Button for closing the dialog
@@ -96,6 +103,20 @@ public class ChangePhotoDialog extends DialogFragment{
             //send the bitmap and fragment to the interface
             mOnPhotoReceived.getBitmapImage(bitmap);
             getDialog().dismiss();
+        }
+
+        /*
+        Results when selecting new image from phone memory
+         */
+        if(requestCode == Init.PICKFILE_REQUEST_CODE && resultCode == Activity.RESULT_OK){
+            Uri selectedImageUri = data.getData();
+            File file = new File(selectedImageUri.toString());
+            Log.d(TAG, "onActivityResult: images: "+file.getPath());
+
+            //Send the bitmap and fragment to the interface
+            mOnPhotoReceived.getImagePath(file.getPath());
+            getDialog().dismiss();
+
         }
     }
 }
