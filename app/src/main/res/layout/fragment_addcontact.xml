@@ -92,7 +92,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/ivPhone"
-                    android:inputType="textNoSuggestions"
+                    android:inputType="phone"
                     android:textSize="16sp"
                     android:textColor="@color/black"
                     android:id="@+id/etContactPhone"
