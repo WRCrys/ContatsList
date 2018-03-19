@@ -1,6 +1,7 @@
 package crys.com.contatslist;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,10 +19,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import crys.com.contatslist.Utils.ContactPropertyListAdapter;
+import crys.com.contatslist.Utils.DatabaseHelper;
 import crys.com.contatslist.Utils.UniversalImageLoader;
 import crys.com.contatslist.models.Contact;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -98,7 +101,7 @@ public class ContactFragment extends Fragment{
 
     private void init(){
         mContactName.setText(mContact.getName());
-        UniversalImageLoader.setImage(mContact.getProfileImage(), mContactImage, null, "https://");
+        UniversalImageLoader.setImage(mContact.getProfileImage(), mContactImage, null, "");
 
         ArrayList<String> properties = new ArrayList<>();
         properties.add(mContact.getPhonenumber());
@@ -121,8 +124,44 @@ public class ContactFragment extends Fragment{
         switch (item.getItemId()){
             case R.id.menu_delete:
                 Log.d(TAG, "onOptionsItemSelected: deleting contacts");
+                DatabaseHelper databaseHelper = new DatabaseHelper(getActivity());
+                Cursor cursor = databaseHelper.getContactId(mContact);
+
+                int contactID = -1;
+                while (cursor.moveToNext()){
+                    contactID = cursor.getInt(0);
+                }
+                if(contactID > -1){
+                    if(databaseHelper.deteleContact(contactID) > 0){
+                        Toast.makeText(getActivity(), "Contact Deleted", Toast.LENGTH_LONG).show();
+
+                        //Clear teh arguments ont he current bundle since the contact is deleted
+                        this.getArguments().clear();
+                        //remove previous fragment from the backstack (therefore navigating back)
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    }else {
+                        Toast.makeText(getActivity(), "Contact Not Was Deleted, Database Error", Toast.LENGTH_LONG).show();
+                    }
+                }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        DatabaseHelper databaseHelper = new DatabaseHelper(getActivity());
+        Cursor cursor = databaseHelper.getContactId(mContact);
+        int contactID = -1;
+        while (cursor.moveToNext()){
+            contactID = cursor.getInt(0);
+        }
+        if(contactID > -1){// If the contact doesn't exists then navigate back by popping the stack
+            init();
+        }else {
+            this.getArguments().clear();//optional clear arguments but not necessary
+            getActivity().getSupportFragmentManager().popBackStack();
+        }
     }
 
     /**

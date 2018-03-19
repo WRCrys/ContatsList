@@ -1,5 +1,6 @@
 package crys.com.contatslist;
 
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -7,7 +8,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +28,7 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import crys.com.contatslist.Utils.ChangePhotoDialog;
+import crys.com.contatslist.Utils.DatabaseHelper;
 import crys.com.contatslist.Utils.Init;
 import crys.com.contatslist.Utils.UniversalImageLoader;
 import crys.com.contatslist.models.Contact;
@@ -48,6 +53,7 @@ public class EditContactFragment extends Fragment implements ChangePhotoDialog.O
     private Spinner mSelectDevice;
     private Toolbar toolbar;
     private String mSelectedImagePath;
+    private int mPreviousKeyStroke;
 
     @Nullable
     @Override
@@ -96,6 +102,32 @@ public class EditContactFragment extends Fragment implements ChangePhotoDialog.O
             public void onClick(View v) {
                 Log.d(TAG, "onClick: saving the edited contact.");
                 //execute the save method for the database
+                if(checkStringIfNull(mName.getText().toString())){
+                    Log.d(TAG, "onClick: saving changes to the contact: "+mName.getText().toString());
+                    //get the database helper and save the contact
+                    DatabaseHelper databaseHelper = new DatabaseHelper(getActivity());
+                    Cursor cursor = databaseHelper.getContactId(mContact);
+
+                    int contactID = -1;
+                    while (cursor.moveToNext()){
+                        contactID = cursor.getInt(0);
+                    }
+                    if(contactID > -1){
+                        if(mSelectedImagePath != null){
+                            mContact.setProfileImage(mSelectedImagePath);
+                        }
+                        mContact.setName(mName.getText().toString());
+                        mContact.setPhonenumber(mPhoneNumber.getText().toString());
+                        mContact.setDevice(mSelectDevice.getSelectedItem().toString());
+                        mContact.setEmail(mEmail.getText().toString());
+
+                        databaseHelper.updateContact(mContact, contactID);
+                        Toast.makeText(getActivity(), "Contact Updated", Toast.LENGTH_LONG).show();
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    }else {
+                        Toast.makeText(getActivity(), "Contact Not Was Updated, Database Error", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
         });
 
@@ -130,11 +162,19 @@ public class EditContactFragment extends Fragment implements ChangePhotoDialog.O
         return view;
     }
 
+    private boolean checkStringIfNull(String string){
+        if(string.equals("")){
+            return false;
+        }else {
+            return true;
+        }
+    }
+
     private void init(){
         mPhoneNumber.setText(mContact.getPhonenumber());
         mName.setText(mContact.getName());
         mEmail.setText(mContact.getEmail());
-        UniversalImageLoader.setImage(mContact.getProfileImage(), mContactImage, null, "http://");
+        UniversalImageLoader.setImage(mContact.getProfileImage(), mContactImage, null, "");
 
         //Setting the selected device to the spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
@@ -197,9 +237,86 @@ public class EditContactFragment extends Fragment implements ChangePhotoDialog.O
 
         switch (item.getItemId()){
             case R.id.menu_delete:
-                Log.d(TAG, "onOptionsItemSelected: deleting contact.");
+                Log.d(TAG, "onOptionsItemSelected: deleting contacts");
+                DatabaseHelper databaseHelper = new DatabaseHelper(getActivity());
+                Cursor cursor = databaseHelper.getContactId(mContact);
+
+                int contactID = -1;
+                while (cursor.moveToNext()){
+                    contactID = cursor.getInt(0);
+                }
+                if(contactID > -1){
+                    if(databaseHelper.deteleContact(contactID) > 0){
+                        Toast.makeText(getActivity(), "Contact Deleted", Toast.LENGTH_LONG).show();
+
+                        //Clear teh arguments ont he current bundle since the contact is deleted
+                        this.getArguments().clear();
+                        //remove previous fragment from the backstack (therefore navigating back)
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    }else {
+                        Toast.makeText(getActivity(), "Contact Not Was Deleted, Database Error", Toast.LENGTH_LONG).show();
+                    }
+                }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Initialize the onTextChangeListener for formatting the phone number
+     */
+    private void initOnTextChangeListener(){
+
+        mPhoneNumber.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+                mPreviousKeyStroke = i;
+                return false;
+            }
+        });
+
+        mPhoneNumber.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String number = editable.toString();
+                Log.d(TAG, "afterTextChanged: "+number);
+
+                if(number.length() == 3 && mPreviousKeyStroke != KeyEvent.KEYCODE_DEL
+                        && !number.contains("(")){
+                    number = String.format("(%s", editable.toString().substring(0,3));
+                    mPhoneNumber.setText(number);
+                    mPhoneNumber.setSelection(number.length());
+                }
+                else if(number.length() == 5 && mPreviousKeyStroke != KeyEvent.KEYCODE_DEL
+                        && !number.contains(")")){
+                    number = String.format("(%s) %s",
+                            editable.toString().substring(1,4),
+                            editable.toString().substring(4,5));
+                    mPhoneNumber.setText(number);
+                    mPhoneNumber.setSelection(number.length());
+                }
+                else if(number.length() ==10 && mPreviousKeyStroke != KeyEvent.KEYCODE_DEL
+                        && !number.contains("-")){
+                    number = String.format("(%s) %s-%s",
+                            editable.toString().substring(1,4),
+                            editable.toString().substring(6,9),
+                            editable.toString().substring(9,10));
+                    mPhoneNumber.setText(number);
+                    mPhoneNumber.setSelection(number.length());
+
+                }
+            }
+        });
     }
 
 }

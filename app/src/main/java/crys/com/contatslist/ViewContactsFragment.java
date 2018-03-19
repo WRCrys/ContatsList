@@ -1,24 +1,33 @@
 package crys.com.contatslist;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Locale;
 
 import crys.com.contatslist.Utils.ContactListAdapter;
+import crys.com.contatslist.Utils.DatabaseHelper;
 import crys.com.contatslist.models.Contact;
 
 /**
@@ -52,6 +61,7 @@ public class ViewContactsFragment extends Fragment {
     private ContactListAdapter adapter;
 
     private ListView contactsList;
+    private EditText mSearchContacts;
 
     @Nullable
     @Override
@@ -61,6 +71,7 @@ public class ViewContactsFragment extends Fragment {
         viewContactsBar = (AppBarLayout) view.findViewById(R.id.viewContactsToolbar);
         searchBar = (AppBarLayout) view.findViewById(R.id.searchToolbar);
         contactsList = (ListView) view.findViewById(R.id.contactsList);
+        mSearchContacts = view.findViewById(R.id.etSearchContacts);
         Log.d(TAG, "onCreateView: started.");
 
         setAppBarState(STANDARD_APPBAR);
@@ -113,26 +124,68 @@ public class ViewContactsFragment extends Fragment {
     //https://
     private void setupContactsList(){
         final ArrayList<Contact> contacts = new ArrayList<>();
-        contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
-        contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Almeida","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        //contacts.add(new Contact("Crystyano Uchiha","(85) 997992233","Mobile","crys@crys.ca",testImageURL));
+        DatabaseHelper databaseHelper = new DatabaseHelper(getActivity());
+        Cursor cursor = databaseHelper.getAllContacts();
+        //Iterate through all the rows contained in the database
+        if(!cursor.moveToNext()){
+            Toast.makeText(getActivity(), "There are no contacts to show", Toast.LENGTH_SHORT).show();
+        }
+        while (cursor.moveToNext()) {
+            contacts.add(new Contact(
+                    cursor.getString(1), //name
+                    cursor.getString(2), //phone number
+                    cursor.getString(3), //device
+                    cursor.getString(4), //email
+                    cursor.getString(5))); //Profile Image Uri
+        }
 
-        adapter = new ContactListAdapter(getActivity(), R.layout.layout_contactlistitem, contacts, "https://");
+        Log.d(TAG, "setupContactsList: image url: "+contacts.get(0).getProfileImage());
+
+        //sort the arrayList based on the contact name
+        Collections.sort(contacts, new Comparator<Contact>() {
+            @Override
+            public int compare(Contact contact, Contact t1) {
+                return contact.getName().compareToIgnoreCase(t1.getName());
+            }
+        });
+
+        adapter = new ContactListAdapter(getActivity(), R.layout.layout_contactlistitem, contacts, "");
+
+        mSearchContacts.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String text = mSearchContacts.getText().toString().toLowerCase(Locale.getDefault());
+                adapter.filter(text);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
         contactsList.setAdapter(adapter);
 
         contactsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -153,6 +206,8 @@ public class ViewContactsFragment extends Fragment {
 
             }
         });
+
+
     }
 
     /**

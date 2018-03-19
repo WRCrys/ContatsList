@@ -18,6 +18,7 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import crys.com.contatslist.R;
 import crys.com.contatslist.models.Contact;
@@ -108,5 +109,22 @@ public class ContactListAdapter extends ArrayAdapter<Contact>{
         //-----------------------------------------------------------------------------------//
 
         return convertView;
+    }
+
+    //Filter class
+    public void filter(String characterText){
+        characterText = characterText.toLowerCase(Locale.getDefault());
+        mContacts.clear();
+        if(characterText.length() == 0){
+            mContacts.addAll(arrayList);
+        }else {
+            mContacts.clear();
+            for(Contact contact: arrayList){
+                if (contact.getName().toLowerCase(Locale.getDefault()).contains(characterText)){
+                    mContacts.add(contact);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 }

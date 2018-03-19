@@ -21,8 +21,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import crys.com.contatslist.Utils.ChangePhotoDialog;
+import crys.com.contatslist.Utils.DatabaseHelper;
 import crys.com.contatslist.Utils.Init;
 import crys.com.contatslist.Utils.UniversalImageLoader;
 import crys.com.contatslist.models.Contact;
@@ -80,15 +82,7 @@ public class AddContactFragment extends Fragment implements ChangePhotoDialog.On
             }
         });
 
-        // save the new contact
-        ImageView ivCheckMark = (ImageView) view.findViewById(R.id.ivCheckMark);
-        ivCheckMark.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "onClick: saving the contact.");
-                //execute the save method for the database
-            }
-        });
+
 
         // initiate the dialog box for choosing an image
         ImageView ivCamera = (ImageView) view.findViewById(R.id.ivCamera);
@@ -118,9 +112,46 @@ public class AddContactFragment extends Fragment implements ChangePhotoDialog.On
             }
         });
 
+        //set onclicklistenre to the 'checkmar' icon for saving a contact
+        ImageView confirmNewContact = (ImageView) view.findViewById(R.id.ivCheckMark);
+        confirmNewContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: attempting to save new contact.");
+                if(checkStringIfNull(mName.getText().toString())){
+                    Log.d(TAG, "onClick: saving new contact. " + mName.getText().toString() );
+
+                    DatabaseHelper databaseHelper = new DatabaseHelper(getActivity());
+                    Contact contact = new Contact(mName.getText().toString(),
+                            mPhoneNumber.getText().toString(),
+                            mSelectDevice.getSelectedItem().toString(),
+                            mEmail.getText().toString(),
+                            mSelectedImagePath);
+                    if(databaseHelper.addContact(contact)){
+                        Toast.makeText(getActivity(), "Contact Saved", Toast.LENGTH_SHORT).show();
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    }else{
+                        Toast.makeText(getActivity(), "Error Saving", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else {
+                    Log.d(TAG, "onClick: in else");
+                }
+
+            }
+        });
+
         initOnTextChangeListener();
 
         return view;
+    }
+
+    private boolean checkStringIfNull(String string){
+        if(string.equals("")){
+            return false;
+        }else {
+            return true;
+        }
     }
 
     /**
